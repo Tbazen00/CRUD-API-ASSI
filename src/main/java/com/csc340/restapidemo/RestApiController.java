@@ -38,7 +38,9 @@ public class RestApiController {
      * @return the list of students.
      */
     @GetMapping("students/all")
+
     public Object getAllStudents() throws IOException {
+
         return StudentService.getAllStudents();
     }
     /**
@@ -48,6 +50,7 @@ public class RestApiController {
      * @return the student.
      */
     @GetMapping("students/{id}")
+
     public Student getStudentById(@PathVariable int id) throws IOException {
       
         return StudentService.getStudentById(id);
@@ -59,6 +62,7 @@ public class RestApiController {
      * @return the List of Students.
      */
     @PostMapping("students/create")
+
     public Object createStudent(@RequestBody Student student) throws IOException {
        
         StudentService.writeStudent(student);
@@ -73,6 +77,7 @@ public class RestApiController {
      * @return the list of students
      */
     @PutMapping("students/update/{id}")
+
     public Object updateStudent(@PathVariable int id, @RequestBody Student student) throws IOException {
        
         StudentService.updateStudent(id, student);
@@ -86,6 +91,7 @@ public class RestApiController {
      * @return the List of Students.
      */
     @DeleteMapping("students/delete/{id}")
+
     public Object deleteStudent(@PathVariable int id) throws IOException {
        
         StudentService.deleteStudent(id);
