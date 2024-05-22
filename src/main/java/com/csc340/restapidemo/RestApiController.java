@@ -22,7 +22,6 @@ public class RestApiController {
     public String hello() {
         return "Hello, World!";
     }
-
     /**
      * Greeting API endpoint.
      *
@@ -33,8 +32,6 @@ public class RestApiController {
     public String greeting(@RequestParam(value = "name", defaultValue = "Dora") String name) {
         return "Hola, soy " + name;
     }
-
-
     /**
      * List all students.
      *
@@ -42,9 +39,8 @@ public class RestApiController {
      */
     @GetMapping("students/all")
     public Object getAllStudents() throws IOException {
-        return StudentService.readAllStudents();
+        return StudentService.getAllStudents();
     }
-
     /**
      * Get one student by Id
      *
@@ -53,10 +49,9 @@ public class RestApiController {
      */
     @GetMapping("students/{id}")
     public Student getStudentById(@PathVariable int id) throws IOException {
-        return StudentService.readStudentById(id);
+      
+        return StudentService.getStudentById(id);
     }
-
-
     /**
      * Create a new Student entry.
      *
@@ -65,10 +60,11 @@ public class RestApiController {
      */
     @PostMapping("students/create")
     public Object createStudent(@RequestBody Student student) throws IOException {
+       
         StudentService.writeStudent(student);
-        return StudentService.readAllStudents();
+       
+        return StudentService.getAllStudents();
     }
-
     /**
      * Update a Student by id
      *
@@ -78,11 +74,11 @@ public class RestApiController {
      */
     @PutMapping("students/update/{id}")
     public Object updateStudent(@PathVariable int id, @RequestBody Student student) throws IOException {
+       
         StudentService.updateStudent(id, student);
-        return StudentService.readAllStudents();
+       
+        return StudentService.getAllStudents();
     }
-
-
     /**
      * Delete a Student by id
      *
@@ -91,8 +87,10 @@ public class RestApiController {
      */
     @DeleteMapping("students/delete/{id}")
     public Object deleteStudent(@PathVariable int id) throws IOException {
+       
         StudentService.deleteStudent(id);
-        return StudentService.readAllStudents();
+        
+        return StudentService.getAllStudents();
     }
 
     /**
