@@ -3,12 +3,11 @@ package com.csc340.restapidemo;
 public class Student {
 
     private int id;
-    private  String name;
-
+    private String name;
     private String major;
-
     private double gpa;
 
+    // Constructor
     public Student(int id, String name, String major, double gpa) {
         this.id = id;
         this.name = name;
@@ -16,6 +15,7 @@ public class Student {
         this.gpa = gpa;
     }
 
+    // Getters and setters for all fields
     public int getId() {
         return id;
     }

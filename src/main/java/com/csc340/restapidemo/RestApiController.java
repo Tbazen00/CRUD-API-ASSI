@@ -6,15 +6,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RestController
 public class RestApiController {
-
-    Map<Integer, Student> studentDatabase = new HashMap<>();
 
     /**
      * Hello World API endpoint.
@@ -44,11 +41,8 @@ public class RestApiController {
      * @return the list of students.
      */
     @GetMapping("students/all")
-    public Object getAllStudents() {
-        if (studentDatabase.isEmpty()) {
-            studentDatabase.put(1, new Student(1, "sample1", "csc", 3.86));
-        }
-        return studentDatabase.values();
+    public Object getAllStudents() throws IOException {
+        return StudentService.readAllStudents();
     }
 
     /**
@@ -58,8 +52,8 @@ public class RestApiController {
      * @return the student.
      */
     @GetMapping("students/{id}")
-    public Student getStudentById(@PathVariable int id) {
-        return studentDatabase.get(id);
+    public Student getStudentById(@PathVariable int id) throws IOException {
+        return StudentService.readStudentById(id);
     }
 
 
@@ -70,10 +64,24 @@ public class RestApiController {
      * @return the List of Students.
      */
     @PostMapping("students/create")
-    public Object createStudent(@RequestBody Student student) {
-        studentDatabase.put(student.getId(), student);
-        return studentDatabase.values();
+    public Object createStudent(@RequestBody Student student) throws IOException {
+        StudentService.writeStudent(student);
+        return StudentService.readAllStudents();
     }
+
+    /**
+     * Update a Student by id
+     *
+     * @param id      the id of student to be updated
+     * @param student the new student info
+     * @return the list of students
+     */
+    @PutMapping("students/update/{id}")
+    public Object updateStudent(@PathVariable int id, @RequestBody Student student) throws IOException {
+        StudentService.updateStudent(id, student);
+        return StudentService.readAllStudents();
+    }
+
 
     /**
      * Delete a Student by id
@@ -82,9 +90,9 @@ public class RestApiController {
      * @return the List of Students.
      */
     @DeleteMapping("students/delete/{id}")
-    public Object deleteStudent(@PathVariable int id) {
-        studentDatabase.remove(id);
-        return studentDatabase.values();
+    public Object deleteStudent(@PathVariable int id) throws IOException {
+        StudentService.deleteStudent(id);
+        return StudentService.readAllStudents();
     }
 
     /**
@@ -99,11 +107,11 @@ public class RestApiController {
             RestTemplate restTemplate = new RestTemplate();
             ObjectMapper mapper = new ObjectMapper();
 
-            //We are expecting a String object as a response from the above API.
-            String jSonQuote = restTemplate.getForObject(url, String.class);
-            JsonNode root = mapper.readTree(jSonQuote);
+            // We are expecting a String object as a response from the above API.
+            String jsonQuote = restTemplate.getForObject(url, String.class);
+            JsonNode root = mapper.readTree(jsonQuote);
 
-            //Parse out the most important info from the response and use it for whatever you want. In this case, just print.
+            // Parse out the most important info from the response and use it for whatever you want. In this case, just print.
             String quoteAuthor = root.get("author").asText();
             String quoteContent = root.get("content").asText();
             System.out.println("Author: " + quoteAuthor);
@@ -134,9 +142,9 @@ public class RestApiController {
             String jsonListResponse = restTemplate.getForObject(url, String.class);
             JsonNode root = mapper.readTree(jsonListResponse);
 
-            //The response from the above API is a JSON Array, which we loop through.
+            // The response from the above API is a JSON Array, which we loop through.
             for (JsonNode rt : root) {
-                //Extract relevant info from the response and use it for what you want, in this case just print to the console.
+                // Extract relevant info from the response and use it for what you want, in this case just print to the console.
                 String name = rt.get("name").asText();
                 String country = rt.get("country").asText();
                 System.out.println(name + ": " + country);
@@ -149,5 +157,31 @@ public class RestApiController {
             return "error in /univ";
         }
 
+    }
+
+    /**
+     * Get a random cat fact from the cat-facts API and make it available at our own API endpoint.
+     *
+     * @return the cat fact json response.
+     */
+    @GetMapping("/catfact")
+    public Object getCatFact() {
+        try {
+            String url = "https://cat-fact.herokuapp.com/facts/random";
+            RestTemplate restTemplate = new RestTemplate();
+            ObjectMapper mapper = new ObjectMapper();
+
+            String jsonFactResponse = restTemplate.getForObject(url, String.class);
+            JsonNode root = mapper.readTree(jsonFactResponse);
+
+            String catFact = root.get("text").asText();
+            System.out.println("Cat Fact: " + catFact);
+
+            return root;
+        } catch (JsonProcessingException ex) {
+            Logger.getLogger(RestApiController.class.getName()).log(Level.SEVERE,
+                    null, ex);
+            return "error in /catfact";
+        }
     }
 }
